@@ -6,15 +6,22 @@
 	<v-app>
 		<div class="login-box">
 			<v-card class="login-form">
-				<v-card-title class="login-title">Login</v-card-title>
+				<v-card-title class="login-title">SignUp</v-card-title>
 				<v-card-subtitle>ユーザー情報をご入力ください</v-card-subtitle>
-				<v-btn text color="light-blue" to="signup">新規登録はこちら</v-btn>
+				<v-btn text color="light-blue" to="login">ログイン画面はこちら</v-btn>
 
 				<v-form
 					ref="form"
 					v-model="valid"
 					lazy-validation
 					>
+
+					<v-text-field
+						v-model="name"
+						:rules="nameRules"
+						label="UserName"
+						required
+					></v-text-field>
 					
 					<v-text-field
 						v-model="email"
@@ -33,12 +40,22 @@
 					<v-btn
 					color="success"
 					class="login-btn"
+					@click="submit"
 					:disabled="isValid">
-						LOGIN
+						SIGN UP
 					</v-btn>
 					<v-btn>
 						CLEAR
 					</v-btn>
+
+					<v-alert
+						dense
+						outlined
+						type="error"
+						v-if="errorMessage"
+						>
+						{{ errorMessage }}
+					</v-alert>
 				</v-form>
 			</v-card>
 		</div>
@@ -47,13 +64,15 @@
 </template>
 
 <script>
+	import firebase from "@/firebase/firebase"
+
 	export default {
 	data: () => ({
 		valid: true,
 		name: '',
 		nameRules: [
-		v => !!v || 'Name is required',
-		v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+		v => !!v || '名前を入力してください',
+		v => (v && v.length <= 10) || '名前は10文字以内で入力してください',
 		],
 		email: '',
 		emailRules: [
@@ -61,6 +80,7 @@
 		v => /.+@.+\..+/.test(v) || 'メールアドレスが不正です',
 		],
 		password: '',
+		errorMessage: "",
 	}),
 	computed: {
 		isValid() {
@@ -78,6 +98,26 @@
 		resetValidation () {
 		this.$refs.form.resetValidation()
 		},
+		submit () {
+			console.log("submit call");
+			firebase.auth()
+			.createUserWithEmailAndPassword(this.email, this.password)
+			.then(async (result) => {
+				console.log("success", result);
+				await result.user.updateProfile (
+					{displayName: this.name}
+				);
+				console.log("update user",result.user);
+
+				//TOPにリダイレクト
+				this.$router.push('/login')
+			})
+			.catch((error) => {
+				console.log("fail", error);
+				//エラーメッセージを表示
+				this.errorMessage = "ユーザーの新規作成に失敗しました。";
+			})
+		}
 	},
 	}
 </script>
