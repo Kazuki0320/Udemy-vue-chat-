@@ -109,6 +109,7 @@
 				);
 				console.log("update user",result.user);
 
+				localStorage.message = "新規作成に成功しました。"
 				//TOPにリダイレクト
 				this.$router.push('/login')
 			})

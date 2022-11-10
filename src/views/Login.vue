@@ -31,14 +31,23 @@
 					</v-text-field>
 
 					<v-btn
-					color="success"
-					class="login-btn"
-					:disabled="isValid">
-						LOGIN
+						color="success"
+						class="login-btn"
+						:disabled="isValid">
+							LOGIN
 					</v-btn>
 					<v-btn>
 						CLEAR
 					</v-btn>
+
+					<v-alert
+						dense
+						text
+						type="success"
+						v-if="message"
+						>
+						{{ message }}
+					</v-alert>
 				</v-form>
 			</v-card>
 		</div>
@@ -61,7 +70,14 @@
 		v => /.+@.+\..+/.test(v) || 'メールアドレスが不正です',
 		],
 		password: '',
+		message: '',
 	}),
+	mounted() {
+		if(localStorage.message) {
+			this.message = localStorage.message
+			localStorage.message = ''
+		}
+	},
 	computed: {
 		isValid() {
 			console.log("isValid", this.valid);
