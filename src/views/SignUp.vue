@@ -110,12 +110,11 @@
 				console.log("update user",result.user);
 
 				localStorage.message = "新規作成に成功しました。"
-				//TOPにリダイレクト
+				//ログイン画面にリダイレクト
 				this.$router.push('/login')
 			})
 			.catch((error) => {
 				console.log("fail", error);
-				//エラーメッセージを表示
 				this.errorMessage = "ユーザーの新規作成に失敗しました。";
 			})
 		}

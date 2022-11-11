@@ -33,6 +33,7 @@
 					<v-btn
 						color="success"
 						class="login-btn"
+						@click="submit"
 						:disabled="isValid">
 							LOGIN
 					</v-btn>
@@ -48,6 +49,15 @@
 						>
 						{{ message }}
 					</v-alert>
+
+					<v-alert
+						dense
+						outlined
+						type="error"
+						v-if="errorMessage"
+						>
+						{{ errorMessage }}
+					</v-alert>
 				</v-form>
 			</v-card>
 		</div>
@@ -56,6 +66,8 @@
 </template>
 
 <script>
+	import firebase from "@/firebase/firebase"
+
 	export default {
 	data: () => ({
 		valid: true,
@@ -71,6 +83,7 @@
 		],
 		password: '',
 		message: '',
+		errorMessage: ''
 	}),
 	mounted() {
 		if(localStorage.message) {
@@ -94,6 +107,22 @@
 		resetValidation () {
 		this.$refs.form.resetValidation()
 		},
+		submit() {
+			console.log("submit call");
+			firebase.auth()
+				.signInWithEmailAndPassword(this.email, this.password)
+				.then((result) => {
+					console.log("success");
+					console.log("user", result.user)
+
+					this.$router.push('/')
+
+				})
+				.catch((error) => {
+					console.log("fail", error);
+					this.errorMessage = "ログインに失敗しました"
+				})
+		}
 	},
 	}
 </script>
