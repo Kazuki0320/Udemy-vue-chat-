@@ -34,7 +34,7 @@
 			</v-list-item-content>
 		</v-list-item>
 
-		<v-list-item>
+		<v-list-item @click="logout">
 			<v-list-item-icon>
 				<v-icon color="blue">
 					mdi-logout
@@ -50,15 +50,31 @@
 </template>
 
 <script>
-	export default {
-	data: () => ({
-		drawer: null,
-		links: [
-		['mdi-inbox-arrow-down', 'Inbox', '/'],
-		['mdi-send', 'Send', '/about'],
-		['mdi-delete', 'Trash', '/about'],
-		['mdi-alert-octagon', 'Spam', '/about'],
-		],
-		}),
+import firebase from "@/firebase/firebase"
+
+export default {
+data: () => ({
+	drawer: null,
+	links: [
+	['mdi-inbox-arrow-down', 'Inbox', '/'],
+	['mdi-send', 'Send', '/about'],
+	['mdi-delete', 'Trash', '/about'],
+	['mdi-alert-octagon', 'Spam', '/about'],
+	],
+}),
+methods: {
+	logout() {
+			console.log("logout call");
+			firebase.auth()
+			.signOut()
+			.then(() => {
+				localStorage.message = "ログアウトに成功しました"
+				this.$router.push('/login')
+			})
+			.catch((error) => {
+				console.log(error);
+			})
+		}
 	}
-  </script>
+}
+</script>
