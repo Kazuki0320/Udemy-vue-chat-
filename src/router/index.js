@@ -5,6 +5,8 @@ import UserList from '../views/UserList.vue'
 import ChatBoard from '../views/ChatBoard.vue'
 import Login from '../views/Login.vue'
 import SignUp from '../views/SignUp.vue'
+import firebase from "@/firebase/firebase"
+
 
 Vue.use(VueRouter)
 
@@ -12,7 +14,8 @@ const routes = [
   {
     path: '/',
     name: 'UserList',
-    component: UserList
+    component: UserList,
+    meta: { requiresAuth: true }
   },
   {
     path: '/about',
@@ -43,6 +46,39 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+// router.beforeEach((to, from, next) => {
+//   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+//   if (requiresAuth) {
+//     const user = sessionStorage.getItem('user')
+//     console.log(JSON.parse(user))
+
+//     if (!user) {
+//           next({
+//             path: '/login',
+//             query: { redirect: to.fullPath }
+//           })
+//       } else {
+//             next()
+//       }
+//   }
+// })
+
+router.beforeEach((to, from, next) => {
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  if (requiresAuth) {
+    firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    })
+    } else {
+        next()
+    }
+  })
+  }
 })
 
 export default router

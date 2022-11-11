@@ -115,6 +115,15 @@
 					console.log("success");
 					console.log("user", result.user)
 
+					const auth = {
+						displayName: result.user.displayName,
+						email: result.user.email,
+						uid: result.user.uid,
+						refreshToken: result.user.refreshToken
+					}
+
+					sessionStorage.setItem('user', JSON.stringify(auth))
+
 					this.$router.push('/')
 
 				})
