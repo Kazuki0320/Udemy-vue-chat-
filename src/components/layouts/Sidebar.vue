@@ -13,7 +13,7 @@
 			size="64"
 		></v-avatar>
   
-		<div class="username">john@vuetifyjs.com</div>
+		<div class="username">{{ auth && auth.displayName }}</div>
 		</v-sheet>
   
 		<v-divider></v-divider>
@@ -53,6 +53,9 @@
 import firebase from "@/firebase/firebase"
 
 export default {
+mounted() {
+	this.auth = JSON.parse(sessionStorage.getItem('user'))
+},
 data: () => ({
 	drawer: null,
 	links: [
@@ -61,6 +64,7 @@ data: () => ({
 	['mdi-delete', 'Trash', '/about'],
 	['mdi-alert-octagon', 'Spam', '/about'],
 	],
+	auth: null
 }),
 methods: {
 	logout() {
@@ -69,6 +73,7 @@ methods: {
 			.signOut()
 			.then(() => {
 				localStorage.message = "ログアウトに成功しました"
+				console.log("ログアウトに成功しました");
 				this.$router.push('/login')
 			})
 			.catch((error) => {

@@ -5,7 +5,7 @@ import UserList from '../views/UserList.vue'
 import ChatBoard from '../views/ChatBoard.vue'
 import Login from '../views/Login.vue'
 import SignUp from '../views/SignUp.vue'
-import firebase from "@/firebase/firebase"
+// import firebase from "@/firebase/firebase"
 
 
 Vue.use(VueRouter)
@@ -48,37 +48,41 @@ const router = new VueRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {
-//   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-//   if (requiresAuth) {
-//     const user = sessionStorage.getItem('user')
-//     console.log(JSON.parse(user))
-
-//     if (!user) {
-//           next({
-//             path: '/login',
-//             query: { redirect: to.fullPath }
-//           })
-//       } else {
-//             next()
-//       }
-//   }
-// })
-
 router.beforeEach((to, from, next) => {
-    const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   if (requiresAuth) {
-    firebase.auth().onAuthStateChanged((user) => {
+    const user = sessionStorage.getItem('user')
+    console.log(JSON.parse(user))
+
     if (!user) {
-    next({
-      path: '/login',
-      query: { redirect: to.fullPath }
-    })
-    } else {
-        next()
-    }
-  })
+          next({
+            path: '/login',
+            query: { redirect: to.fullPath }
+          })
+      } else {
+            next()
+      }
   }
 })
 
+// router.beforeEach((to, from, next) => {
+//     const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+// 	console.log("requiresAuth", requiresAuth);
+// 	if(requiresAuth) {
+// 		firebase.auth().onAuthStateChanged((user) => {
+// 			console.log("usr", user);
+// 			if (!user) {
+// 				next({
+// 					path: '/login',
+// 					query: { redirect: to.fullPath }
+// 				})
+// 			} else {
+// 				next()
+// 			}
+		// })
+	// }else {
+	// 	next()
+	// }
+	// })
+	
 export default router
