@@ -63,6 +63,9 @@ router.beforeEach((to, from, next) => {
             next()
       }
   }
+  else {
+		next()
+	}
 })
 
 // router.beforeEach((to, from, next) => {

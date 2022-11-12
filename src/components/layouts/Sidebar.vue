@@ -1,64 +1,62 @@
-	<template>
-		<v-navigation-drawer
-			v-model="drawer"
-			app
+<template>
+	<v-navigation-drawer
+		v-model="drawer"
+		app
+	>
+		<v-sheet
+		color="grey lighten-4"
+		class="pa-4"
 		>
-			<v-sheet
-			color="grey lighten-4"
-			class="pa-4"
-			>
+		<v-avatar color="indigo">
+			<input type="file"
+						ref="fileInput"
+						accept="image/jpeg, image.jpg, image.png"
+						style="display: none"
+						@change="updateIcon">
+			<v-icon dark
+						@click="changeIcon">
+				mdi-account-circle
+			</v-icon>
+		</v-avatar>
 
-			<v-avatar color="indigo">
-				<input type="file"
-							ref="fileInput"
-							accept="image/jpeg, image.jpg, image.png"
-							style="display: none">
-				<v-icon dark
-							@click="changeIcon">
-					mdi-account-circle
+		<div class="username">{{ auth && auth.displayName }}</div>
+		</v-sheet>
+
+		<v-divider></v-divider>
+
+		<v-list>
+		<v-list-item
+			v-for="[icon, text, to] in links"
+			:key="icon"
+			:to="to"
+			link
+		>
+			<v-list-item-icon>
+			<v-icon>{{ icon }}</v-icon>
+			</v-list-item-icon>
+
+			<v-list-item-content>
+			<v-list-item-title>{{ text }}</v-list-item-title>
+			</v-list-item-content>
+		</v-list-item>
+		<v-list-item @click="logout">
+			<v-list-item-icon>
+				<v-icon color="blue">
+					mdi-logout
 				</v-icon>
-			</v-avatar>
-	
-			<div class="username">{{ auth && auth.displayName }}</div>
-			</v-sheet>
-	
-			<v-divider></v-divider>
-	
-			<v-list>
-			<v-list-item
-				v-for="[icon, text, to] in links"
-				:key="icon"
-				:to="to"
-				link
-			>
-				<v-list-item-icon>
-				<v-icon>{{ icon }}</v-icon>
-				</v-list-item-icon>
-	
-				<v-list-item-content>
-				<v-list-item-title>{{ text }}</v-list-item-title>
-				</v-list-item-content>
-			</v-list-item>
+			</v-list-item-icon>
+			<v-list-item-content>
+				<v-list-item-title>Logout</v-list-item-title>
+			</v-list-item-content>
+		</v-list-item>
+		</v-list>
+	</v-navigation-drawer>
+</template>
 
-			<v-list-item @click="logout">
-				<v-list-item-icon>
-					<v-icon color="blue">
-						mdi-logout
-					</v-icon>
-				</v-list-item-icon>
-				<v-list-item-content>
-					<v-list-item-title>Logout</v-list-item-title>
-				</v-list-item-content>
-			</v-list-item>
+<script>
+import firebase from "@/firebase/firebase"
 
-			</v-list>
-		</v-navigation-drawer>
-	</template>
-
-	<script>
-	import firebase from "@/firebase/firebase"
-
-	export default {
+export default {
 	mounted() {
 		this.auth = JSON.parse(sessionStorage.getItem('user'))
 	},
@@ -87,9 +85,31 @@
 				})
 		},
 		changeIcon() {
-			console.log("changeIcon call");
 			this.$refs.fileInput.click()
+		},
+		updateIcon() {
+			console.log("updateIcon call")
+			const user = this.getAuth()
+			if(!user)	{
+				sessionStorage.removeItem('user')
+				this.$router.push('/login')
+			}
+			const file = this.$refs.fileInput.files[0]
+			const filePath = `user/${file.name}`
+			console.log(file)
+			
+			firebase.storage().ref()
+				.child(filePath)
+				.put(file)
+				.then(snapshot => {
+					console.log("snapshot", snapshot)
+				});
+		},
+		getAuth() {
+			return firebase.auth().onAuthStateChanged((user) => {
+				return user
+			})
 		}
-	} 
+	}	
 }
 </script>
