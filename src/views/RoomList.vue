@@ -35,9 +35,31 @@
   
   <script>
 import Sidebar from '@/components/layouts/Sidebar.vue'
+import firebase from "@/firebase/firebase"
+
 export default {
 	components: {
 		Sidebar
+	},
+	mounted() {
+		this.getRooms()
+	},
+	methods: {
+		async getRooms() {
+
+		const roomRef = firebase.firestore().collection("rooms")
+		const snapshot = await roomRef.get()
+		console.log("snapshot", snapshot);
+
+		// snapshot.forEach(doc => {
+		// 	console.log(doc.data())
+		// })
+
+		snapshot.docs.map(doc => {
+			console.log(doc.data())
+		})
+
+		}
 	}
 }
   </script>
