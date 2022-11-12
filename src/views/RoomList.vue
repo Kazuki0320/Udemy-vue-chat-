@@ -7,6 +7,7 @@
 	>
 
 		<v-toolbar-title>ルーム一覧</v-toolbar-title>
+		<CreateRoom />
 
 		<v-spacer></v-spacer>
 
@@ -55,11 +56,13 @@
   
   <script>
 import Sidebar from '@/components/layouts/Sidebar.vue'
+import CreateRoom from '@/components/modal/CreateRoom.vue'
 import firebase from "@/firebase/firebase"
 
 export default {
 	components: {
-		Sidebar
+		Sidebar,
+		CreateRoom
 	},
 	data: () => ({
 		rooms: []
