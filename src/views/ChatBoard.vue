@@ -21,6 +21,7 @@
 				<div v-for = "(data, index) in messages" :key="index">
 					<v-list-item>
 						<v-list-item-avatar color="grey darken-1">
+							<v-img src="data.photoURL"></v-img>
 						</v-list-item-avatar>
 					
 						<v-list-item-content>  
@@ -64,86 +65,92 @@
 	</v-app>
 	</template>
 
-	<script>
-	import firebase from "@/firebase/firebase"
-	import Sidebar from '@/components/layouts/Sidebar.vue'
+<script>
+import firebase from "@/firebase/firebase"
+import Sidebar from '@/components/layouts/Sidebar.vue'
 
-	export default {
-		components: {
-			Sidebar
-		},
-	async created() {
-		const roomId = this.$route.query.room_id; 
-		console.log("roomId", roomId);
-
-		const roomRef = firebase.firestore().collection("rooms").doc(roomId)
-		const roomDoc = await roomRef.get()
-		if(!roomDoc.exists) {
-			await this.$router.push('/')
-		}
-		this.room = roomDoc.data()
-		console.log("room", this.room);
-
-		const snapshot = await roomRef.collection('messages').orderBy("createdAt", "asc").get()
-
-		snapshot.forEach(doc => {
-			console.log(doc.data());
-			this.messages.push(doc.data());
-		})
-		
-		// const chatRef = firebase.firestore().collection("chats");
-		// console.log("chatRef", chatRef);
-		// const snapshot = await chatRef.get();
-		// console.log("snapshot", snapshot);
-
-		// snapshot.forEach(doc => {
-		// 	console.log(doc.data());
-		// 	this.messages.push(doc.data());
-		// })
+export default {
+	components: {
+		Sidebar
 	},
-	data: () => ({
-		messages: [
-		// {message:"message 1"},
-		// {message:"message 2"},
-		// {message:"message 3"},
-		// {message:"message 4"},
-		// {message:"message 5"},
-		],
-		body: '',
-		roomId: '',
-		room: null,
-		cards: ['Today'],
-		drawer: null,
-		links: [
-		['mdi-inbox-arrow-down', 'Inbox'],
-		['mdi-send', 'Send'],
-		['mdi-delete', 'Trash'],
-		['mdi-alert-octagon', 'Spam'],
-		],
-		// invalid: false
-		}),
-		computed: {
-			invalid () {
-				console.log("invalid call", this.body);
-				if(!this.body) {
-					return true;
-				}
-				return false;
+async created() {
+	const roomId = this.$route.query.room_id; 
+	console.log("roomId", roomId);
+	const roomRef = firebase.firestore().collection("rooms").doc(roomId)
+	const roomDoc = await roomRef.get()
+	if(!roomDoc.exists) {
+		await this.$router.push('/')
+	}
+	this.room = roomDoc.data()
+	console.log("room", this.room);
+	const snapshot = await roomRef.collection('messages').orderBy("createdAt", "asc").get()
+	snapshot.forEach(doc => {
+		console.log(doc.data());
+		this.messages.push(doc.data());
+	})
+	
+	// const chatRef = firebase.firestore().collection("chats");
+	// console.log("chatRef", chatRef);
+	// const snapshot = await chatRef.get();
+	// console.log("snapshot", snapshot);
+	// snapshot.forEach(doc => {
+	// 	console.log(doc.data());
+	// 	this.messages.push(doc.data());
+	// })
+},
+mounted() {
+	this.auth = JSON.parse(sessionStorage.getItem('user'))
+	console.log(this.auth)
+},
+data: () => ({
+	messages: [
+	// {message:"message 1"},
+	// {message:"message 2"},
+	// {message:"message 3"},
+	// {message:"message 4"},
+	// {message:"message 5"},
+	],
+	body: '',
+	roomId: '',
+	room: null,
+	cards: ['Today'],
+	drawer: null,
+	links: [
+	['mdi-inbox-arrow-down', 'Inbox'],
+	['mdi-send', 'Send'],
+	['mdi-delete', 'Trash'],
+	['mdi-alert-octagon', 'Spam'],
+	],
+	auth: null,
+	// invalid: false
+	}),
+	computed: {
+		invalid () {
+			// console.log("invalid call", this.body);
+			if(!this.body) {
+				return true;
 			}
+			return false;
+		}
+	},
+	methods: {
+		clear() {
+			// console.log("clear call");
+			this.body = "";
 		},
-		methods: {
-			clear() {
-				console.log("clear call");
-				this.body = "";
-			},
-			submit() {
-				console.log("submit call", this.body);
-				this.messages.unshift({message: this.body});
-				this.body = "";
-			}
+		submit() {
+			console.log("submit call", this.body);
+			this.messages.unshift({
+				message: this.body,
+				name: this.auth.displayName,
+				photoURL: this.auth.photoURL,
+				createdAt: firebase.firestore.Timestamp.now()
+			});
+			this.body = "";
 		}
 	}
-	</script>
+}
+</script>
 
 <style scoped>
 .message {
