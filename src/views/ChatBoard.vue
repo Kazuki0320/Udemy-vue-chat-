@@ -15,7 +15,7 @@
 			>
 			<v-card>
 				<v-subheader>{{ card }}</v-subheader>
-  
+
 				<v-list two-line>
 				<div v-for = "(data, index) in messages" :key="index">
 					<v-list-item>
@@ -28,7 +28,7 @@
 							</v-list-item-subtitle>
 						</v-list-item-content>
 					</v-list-item>
-  
+
 					<v-divider
 					v-if="index !== 6"
 					:key="`divider-${index}`"
@@ -41,29 +41,29 @@
 		</v-row>
 		</v-container>
 		<v-textarea
-		v-model="body"
-          append-icon="mdi-comment"
-          class="mx-2"
-          label="メッセージを送信"
-          rows="3"
-		auto-grow
-        ></v-textarea>
+			v-model="body"
+			append-icon="mdi-comment"
+			class="mx-2"
+			label="メッセージを送信"
+			rows="3"
+			auto-grow
+		></v-textarea>
 		<v-btn
-        class="mr-4"
-        type="submit"
-        :disabled="invalid"
+			class="mr-4"
+			type="submit"
+			:disabled="invalid"
 		@click="submit"
-      >
-        submit
-      </v-btn>
-      <v-btn @click="clear">
-        clear
-      </v-btn>
+		>
+		submit
+		</v-btn>
+		<v-btn @click="clear">
+		clear
+		</v-btn>
 	</v-main>
 	</v-app>
-  </template>
-  
-  <script>
+	</template>
+
+	<script>
 	import firebase from "@/firebase/firebase"
 	import Sidebar from '@/components/layouts/Sidebar.vue'
 
@@ -72,18 +72,26 @@
 			Sidebar
 		},
 	async created() {
-		const user_id = this.$route.query.user_id; 
-		console.log("user_id", user_id);
+		const roomId = this.$route.query.room_id; 
+		console.log("roomId", roomId);
 
-		const chatRef = firebase.firestore().collection("chats");
-		console.log("chatRef", chatRef);
-		const snapshot = await chatRef.get();
-		console.log("snapshot", snapshot);
+		const roomRef = firebase.firestore().collection("rooms").doc(roomId)
+		const roomDoc = await roomRef.get()
+		if(!roomDoc.exists) {
+			await this.$router.push('/')
+		}
+		const room = roomDoc.data()
+		console.log("room", room);
 
-		snapshot.forEach(doc => {
-			console.log(doc.data());
-			this.messages.push(doc.data());
-		})
+		// const chatRef = firebase.firestore().collection("chats");
+		// console.log("chatRef", chatRef);
+		// const snapshot = await chatRef.get();
+		// console.log("snapshot", snapshot);
+
+		// snapshot.forEach(doc => {
+		// 	console.log(doc.data());
+		// 	this.messages.push(doc.data());
+		// })
 	},
 	data: () => ({
 		messages: [
@@ -94,7 +102,7 @@
 		// {message:"message 5"},
 		],
 		body: '',
-		user_id: '',
+		roomId: '',
 		cards: ['Today'],
 		drawer: null,
 		links: [
@@ -126,7 +134,7 @@
 			}
 		}
 	}
-  </script>
+	</script>
 
 <style scoped>
 .message {

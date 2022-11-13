@@ -15,7 +15,7 @@
 		<v-icon>mdi-dots-vertical</v-icon>
 		</v-btn>
 	</v-app-bar>
-  
+
 	<v-main>
 		<v-container>
 		<v-row>
@@ -52,9 +52,9 @@
 		</v-container>
 	</v-main>
 	</v-app>
-  </template>
-  
-  <script>
+</template>
+
+<script>
 import Sidebar from '@/components/layouts/Sidebar.vue'
 import CreateRoom from '@/components/modal/CreateRoom.vue'
 import firebase from "@/firebase/firebase"
