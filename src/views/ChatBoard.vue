@@ -3,6 +3,7 @@
 	<sidebar />
 	
 	<v-main>
+		<h1>{{ room? room.name : ""}}</h1>
 		<v-container
 		class="py-8 px-6"
 		fluid
@@ -80,9 +81,16 @@
 		if(!roomDoc.exists) {
 			await this.$router.push('/')
 		}
-		const room = roomDoc.data()
-		console.log("room", room);
+		this.room = roomDoc.data()
+		console.log("room", this.room);
 
+		const snapshot = await roomRef.collection('messages').get()
+
+		snapshot.forEach(doc => {
+			console.log(doc.data());
+			this.messages.push(doc.data());
+		})
+		
 		// const chatRef = firebase.firestore().collection("chats");
 		// console.log("chatRef", chatRef);
 		// const snapshot = await chatRef.get();
@@ -103,6 +111,7 @@
 		],
 		body: '',
 		roomId: '',
+		room: null,
 		cards: ['Today'],
 		drawer: null,
 		links: [
