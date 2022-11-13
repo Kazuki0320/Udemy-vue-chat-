@@ -82,11 +82,19 @@ export default {
 		// })
 
 		snapshot.docs.map(doc => {
-			console.log(doc.data())
-			this.rooms.push(doc.data())
+			// const data = {
+			// 	name: doc.data().name,
+			// 	thumbnailUrl: doc.data().thumbnailUrl,
+			// 	createAt: doc.data().createAt
+			// }
+
+			const data = {...doc.data()}
+			data.id = doc.id
+			console.log(data)
+			this.rooms.push(data)
 		})
 
 		}
 	}
 }
-  </script>
+</script>

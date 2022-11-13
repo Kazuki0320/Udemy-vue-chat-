@@ -24,12 +24,14 @@
 		<v-row>
 				<v-col cols="12">
 					<v-text-field
-							label="Room Name*"
-							required
+						v-model="name"
+						label="Room Name*"
+						required
 					></v-text-field>
 				</v-col>
 				<v-col cols="12">
 					<v-file-input
+						v-model="file"
 						truncate-length="15"
 						accept="image/*"
 					></v-file-input>
@@ -41,18 +43,18 @@
 	<v-card-actions>
 			<v-spacer></v-spacer>
 			<v-btn
-		color="blue darken-1"
-		text
-		@click="dialog = false"
+				color="blue darken-1"
+				text
+				@click="dialog = false"
 			>
-		Close
+				Close
 			</v-btn>
 			<v-btn
-		color="blue darken-1"
-		text
-		@click="dialog = false"
+				color="blue darken-1"
+				text
+				@click="OnSubmit"
 			>
-		Save
+				Save
 			</v-btn>
 	</v-card-actions>
 		</v-card>
@@ -61,9 +63,41 @@
 </template>
 
 <script>
-	export default {
-data: () => ({
-		dialog: false,
-}),
+import firebase from "@/firebase/firebase"
+
+export default {
+	data: () => ({
+			dialog: false,
+			name: "",
+			file: null
+	}),
+	methods: {
+		async OnSubmit() {
+			console.log("OnSubmit call", this.name, this.file)
+
+			let thumbnailUrl = ""
+			if(this.file) {
+				const filePath = `/room/${this.file.name}`
+				await firebase.storage().ref()
+				.child(filePath)
+				.put(this.file)
+				.then(async snapshot => {
+					thumbnailUrl = await snapshot.ref.getDownloadURL()
+					console.log("thumbnailUrl", thumbnailUrl)
+				})
+			}
+
+			const roomRef = firebase.firestore().collection('rooms')
+			await roomRef.add({
+				name: this.name,
+				thumbnailUrl: thumbnailUrl,
+				createdAt: firebase.firestore.Timestamp.now()
+			})
+			.then(result => {
+				console.log("success to create room", result)
+				this.dialog = false
+			})
+		}
 	}
+}
 </script>

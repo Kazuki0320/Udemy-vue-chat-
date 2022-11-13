@@ -8,11 +8,11 @@
 		class="pa-4"
 		>
 		<v-avatar color="indigo">
-			<input type="file"
-						ref="fileInput"
-						accept="image/jpeg, image.jpg, image.png"
-						style="display: none"
-						@change="updateIcon">
+			<input	type="file"
+					ref="fileInput"
+					accept="image/jpeg, image.jpg, image.png"
+					style="display: none"
+					@change="updateIcon">
 			<v-icon dark
 						v-if="!photoUrl"
 						@click="changeIcon">
