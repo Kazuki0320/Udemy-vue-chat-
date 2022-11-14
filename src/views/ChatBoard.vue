@@ -21,7 +21,7 @@
 				<div v-for = "(data, index) in messages" :key="index">
 					<v-list-item>
 						<v-list-item-avatar color="grey darken-1">
-							<v-img src="data.photoURL"></v-img>
+							<v-img :src="data.photoURL"></v-img>
 						</v-list-item-avatar>
 					
 						<v-list-item-content>  
@@ -73,9 +73,10 @@ export default {
 	components: {
 		Sidebar
 	},
+
 async created() {
 	const roomId = this.$route.query.room_id; 
-	console.log("roomId", roomId);
+	// console.log("roomId", roomId);
 	const roomRef = firebase.firestore().collection("rooms").doc(roomId)
 	const roomDoc = await roomRef.get()
 	if(!roomDoc.exists) {
@@ -139,14 +140,29 @@ data: () => ({
 			this.body = "";
 		},
 		submit() {
-			console.log("submit call", this.body);
+			// console.log("submit call", this.body);
 			this.messages.unshift({
 				message: this.body,
 				name: this.auth.displayName,
 				photoURL: this.auth.photoURL,
 				createdAt: firebase.firestore.Timestamp.now()
 			});
-			this.body = "";
+			
+			const roomRef = firebase.firestore().collection("rooms").doc(this.roomId)//←本当はdoc.(this.roomId)で、入力したメッセージをリロードした後も保持したい
+			roomRef.collection('messages').add({
+				message: this.body,
+				name: this.auth.displayName,
+				photoURL: this.auth.photoURL,
+				createdAt: firebase.firestore.Timestamp.now()
+			})
+			.then(result => {
+				console.log('success', result);
+				this.body = "";
+			})
+			.catch(error => {
+				console.log('fail', error);
+				alert('メッセージの送信に失敗しました。')
+			})
 		}
 	}
 }
