@@ -82,14 +82,14 @@ async created() {
 	}
 	this.room = roomDoc.data()
 	console.log("room", this.room);
-	
+
 	// const snapshot = await roomRef.collection('messages').orderBy("createdAt", "asc").get()
 	// snapshot.forEach(doc => {
 	// 	console.log(doc.data());
 	// 	this.messages.push(doc.data());
 	// })
 	
-	// const chatRef = firebase.firestore().collection("chats");
+	// const chatRef = firebase.firestore().collection("chats")
 	// console.log("chatRef", chatRef);
 	// const snapshot = await chatRef.get();
 	// console.log("snapshot", snapshot);
@@ -102,14 +102,15 @@ mounted() {
 	this.auth = JSON.parse(sessionStorage.getItem('user'))
 	console.log(this.auth)
 
-	// const roomRef = firebase.firestore().collection('rooms').doc(this.roomId)
-	// roomRef.collection('messages').orderBy("createdAt", "asc")
-	// .onSnapshot(snapshot => {
-	// 	snapshot.docChanges().forEach(change => {
-	// 		console.log("new message", change.doc.data())
-	// 		this.message.push(change.doc.data())
-	// 	})
-	// })
+	const roomRef = firebase.firestore().collection('rooms').doc(this.roomId);
+	roomRef.collection('messages').orderBy('createdAt', "asc")
+	.onSnapshot(snapshot => {
+		snapshot.docChanges().forEach(change => {
+			console.log("new message", change.doc.data())
+			this.messages.push(change.doc.data())
+		})
+	})
+
 },
 data: () => ({
 	messages: [
@@ -146,15 +147,17 @@ data: () => ({
 	},
 	methods: {
 		clear() {
+			// console.log("clear call");
 			this.body = "";
 		},
 		submit() {
-			this.messages.push({
-				message: this.body,
-				name: this.auth.displayName,
-				photoURL: this.auth.photoURL,
-				createdAt: firebase.firestore.Timestamp.now()
-			});
+			// console.log("submit call", this.body);
+			// this.messages.push({
+			// 	message: this.body,
+			// 	name: this.auth.displayName,
+			// 	photoURL: this.auth.photoURL,
+			// 	createdAt: firebase.firestore.Timestamp.now()
+			// });
 			
 			const roomRef = firebase.firestore().collection("rooms").doc(this.roomId);
 			roomRef.collection('messages').add({
