@@ -75,20 +75,19 @@ export default {
 	},
 
 async created() {
-	const roomId = this.$route.query.room_id; 
-	// console.log("roomId", roomId);
-	const roomRef = firebase.firestore().collection("rooms").doc(roomId)
+	const roomRef = firebase.firestore().collection("rooms").doc(this.roomId)
 	const roomDoc = await roomRef.get()
 	if(!roomDoc.exists) {
 		await this.$router.push('/')
 	}
 	this.room = roomDoc.data()
 	console.log("room", this.room);
-	const snapshot = await roomRef.collection('messages').orderBy("createdAt", "asc").get()
-	snapshot.forEach(doc => {
-		console.log(doc.data());
-		this.messages.push(doc.data());
-	})
+	
+	// const snapshot = await roomRef.collection('messages').orderBy("createdAt", "asc").get()
+	// snapshot.forEach(doc => {
+	// 	console.log(doc.data());
+	// 	this.messages.push(doc.data());
+	// })
 	
 	// const chatRef = firebase.firestore().collection("chats");
 	// console.log("chatRef", chatRef);
@@ -102,6 +101,15 @@ async created() {
 mounted() {
 	this.auth = JSON.parse(sessionStorage.getItem('user'))
 	console.log(this.auth)
+
+	// const roomRef = firebase.firestore().collection('rooms').doc(this.roomId)
+	// roomRef.collection('messages').orderBy("createdAt", "asc")
+	// .onSnapshot(snapshot => {
+	// 	snapshot.docChanges().forEach(change => {
+	// 		console.log("new message", change.doc.data())
+	// 		this.message.push(change.doc.data())
+	// 	})
+	// })
 },
 data: () => ({
 	messages: [
@@ -112,7 +120,6 @@ data: () => ({
 	// {message:"message 5"},
 	],
 	body: '',
-	roomId: '',
 	room: null,
 	cards: ['Today'],
 	drawer: null,
@@ -132,23 +139,24 @@ data: () => ({
 				return true;
 			}
 			return false;
+		},
+		roomId () {
+			return 	this.$route.query.room_id; 
 		}
 	},
 	methods: {
 		clear() {
-			// console.log("clear call");
 			this.body = "";
 		},
 		submit() {
-			// console.log("submit call", this.body);
-			this.messages.unshift({
+			this.messages.push({
 				message: this.body,
 				name: this.auth.displayName,
 				photoURL: this.auth.photoURL,
 				createdAt: firebase.firestore.Timestamp.now()
 			});
 			
-			const roomRef = firebase.firestore().collection("rooms").doc(this.roomId)//←本当はdoc.(this.roomId)で、入力したメッセージをリロードした後も保持したい
+			const roomRef = firebase.firestore().collection("rooms").doc(this.roomId);
 			roomRef.collection('messages').add({
 				message: this.body,
 				name: this.auth.displayName,
