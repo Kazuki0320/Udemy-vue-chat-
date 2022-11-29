@@ -54,12 +54,12 @@
 			class="mr-4"
 			type="submit"
 			:disabled="invalid"
-		@click="submit"
+			@click="submit"
 		>
-		submit
+			submit
 		</v-btn>
 		<v-btn @click="clear">
-		clear
+			clear
 		</v-btn>
 	</v-main>
 	</v-app>
